@@ -1,0 +1,8 @@
+TODO:
+1. Write logger
+2. Clear sqlite database after reading entries created before job completes [Dont clear]
+3. Write REST server
+4. Add hot reload to configuration
+5. Create configuration file
+
+sdsd

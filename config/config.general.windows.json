@@ -1,0 +1,22 @@
+{
+  "service": {
+    "name": "DirWatcher",
+    "displayName": "Directory watcher",
+    "version": "v1.0",
+    "fileEventDB":{
+      "dbPath": "D:\\Projects\\github.com\\pramod-janardhana\\dir-watcher\\file_event.sqlite",
+      "initScript": "D:\\Projects\\github.com\\pramod-janardhana\\dir-watcher\\file_event.sql"
+    },
+    "jobRunsDB":{
+      "dbPath": "D:\\Projects\\github.com\\pramod-janardhana\\dir-watcher\\job_runs.sqlite",
+      "initScript": "D:\\Projects\\github.com\\pramod-janardhana\\dir-watcher\\job_runs.sql"
+    },
+    "server": {
+      "host": "127.0.0.1",
+      "ServerPort": 8000
+    },
+    "logging":{
+      "path":"dirwatcher.log"
+    }
+  }
+}

@@ -1,5 +1,5 @@
-.sqlite
-.exe
+*.sqlite
+*.exe
 
 # Created by https://www.toptal.com/developers/gitignore/api/goland,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=goland,visualstudiocode

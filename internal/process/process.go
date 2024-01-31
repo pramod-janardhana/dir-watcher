@@ -64,6 +64,14 @@ func LoadScheduler(jobRunsDB, fileEventDB database.Database) {
 		var magicStringCount, deletedFilesCount, createdFilesCount int64 = 0, 0, 0
 		fileEventStore := datastore.NewFileEventStore(fileEventDB)
 
+		if fileEvents, err := fileEventStore.Get(1, 0); err != nil {
+			zlog.Errorf("error getting file event details: %s", err.Error())
+			return
+		} else if len(fileEvents) > 0 {
+			createdFilesCount = fileEvents[0].CreatedFilesCount
+			deletedFilesCount = fileEvents[0].DeletedFilesCount
+		}
+
 		var abortSend, abortReceive = make(chan struct{}), make(chan struct{})
 		var jobAborted atomic.Int32
 		jobAborted.Store(0)
@@ -96,41 +104,14 @@ func LoadScheduler(jobRunsDB, fileEventDB database.Database) {
 		}(&wg)
 
 	beakLoop:
-		for limit, offset := 20, 0; ; offset = offset + limit {
+		for path, _ := range watcher.GetFileWatcher().WatchedFiles() {
 			select {
 			case <-abortSend:
 				zlog.Debugf("[task publisher] received abort signal. Terminaing the current job run")
 				jobAborted.Store(1)
 				break beakLoop
 			default:
-				fileEvents, err := fileEventStore.Get(limit, offset)
-				if err != nil {
-					zlog.Errorf("[task publisher] failed to get events from file event table: %s", err.Error())
-					zlog.Debugf("[task publisher] sending abort signal to terminal the current job run")
-					abortReceive <- struct{}{}
-
-					break beakLoop
-				}
-
-				if len(fileEvents) == 0 {
-					zlog.Debugf("completed processing")
-					// done <- struct{}{}
-					break beakLoop
-				}
-
-				for _, fileEvent := range fileEvents {
-					switch fileEvent.Event {
-					case int8(watcher.FILE_CREATED):
-						createdFilesCount += 1
-						wpool.TaskChan() <- workerpool.NewTask(rand.Int(), fileEvent.Path)
-					case int8(watcher.FILE_DELETED):
-						deletedFilesCount += 1
-					case int8(watcher.FILE_MODIFIED):
-						wpool.TaskChan() <- workerpool.NewTask(rand.Int(), fileEvent.Path)
-					default:
-						zlog.Errorf("unsupported event type %d for file %s", fileEvent.Event, fileEvent.Path)
-					}
-				}
+				wpool.TaskChan() <- workerpool.NewTask(rand.Int(), path)
 			}
 		}
 
@@ -196,28 +177,30 @@ func LoadFileWatcher(fileEventDB database.Database) {
 	zlog.Debugf("starting the file watcher")
 	fw := watcher.NewFileWatcher(watcher.Config{
 		PathToWatch: config.ServiceConf.FileWatcher.DirOrFileToWatch,
-		Ops:         []watcher.Op{watcher.FILE_CREATED, watcher.FILE_MODIFIED, watcher.FILE_DELETED},
+		Ops:         []watcher.Op{watcher.FILE_CREATED, watcher.FILE_DELETED},
 		Frequency:   time.Duration(config.ServiceConf.FileWatcher.FrequencyInSecond) * time.Second,
 	})
 
 	fwHandler := func(event watcher.Event) {
 		fileEventStore := datastore.NewFileEventStore(fileEventDB)
+		var deletedFilesCount, createdFilesCount int64 = 0, 0
 		if !event.IsDir() {
-			e := entity.FileEvent{Path: event.Path, Timestamp: event.ModTime().UTC()}
 			switch watcher.Op(event.Op) {
 			case watcher.FILE_CREATED:
-				e.Event = int8(watcher.FILE_CREATED)
+				createdFilesCount += 1
 			case watcher.FILE_DELETED:
-				e.Event = int8(watcher.FILE_DELETED)
-			case watcher.FILE_MODIFIED:
-				e.Event = int8(watcher.FILE_MODIFIED)
+				deletedFilesCount += 1
 			default:
 				zlog.Errorf("unsupported file watcher event %d for file %s", event.Op, event.Path)
 				return
 			}
 
 			// TODO: add batching support
-			if err := fileEventStore.Upset(e); err != nil {
+			if err := fileEventStore.Upset(entity.FileEvent{
+				Id:                1,
+				DeletedFilesCount: deletedFilesCount,
+				CreatedFilesCount: createdFilesCount,
+			}); err != nil {
 				log.Println("error in file handle", err)
 				zlog.Errorf("error adding event to file_event table: %s", err.Error())
 				return
@@ -225,16 +208,6 @@ func LoadFileWatcher(fileEventDB database.Database) {
 
 			zlog.Debugf("add event (type: %d, file: %s) to file_event table", event.Op, event.Path)
 		}
-	}
-
-	// register files being watched in database
-	{
-		for path, f := range fw.WatchedFiles() {
-			e := watcher.NewEvent(watcher.FILE_CREATED, path, path, f)
-			fwHandler(*e)
-		}
-
-		zlog.Debugf("registered all file being watched to file event database")
 	}
 
 	go func() {

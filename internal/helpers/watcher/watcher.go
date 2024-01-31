@@ -12,9 +12,8 @@ import (
 type Op watcher.Op
 
 const (
-	FILE_CREATED  Op = Op(watcher.Create)
-	FILE_DELETED  Op = Op(watcher.Remove)
-	FILE_MODIFIED Op = Op(watcher.Write)
+	FILE_CREATED Op = Op(watcher.Create)
+	FILE_DELETED Op = Op(watcher.Remove)
 )
 
 var filewatcher *fileWatcher = nil

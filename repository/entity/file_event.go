@@ -1,29 +1,25 @@
 package entity
 
-import (
-	"time"
-)
-
 type FileEvent struct {
-	Path      string
-	Event     int8
-	Timestamp time.Time
+	Id                int8
+	DeletedFilesCount int64
+	CreatedFilesCount int64
 }
 
 func (e *FileEvent) TableName() string {
 	return "file_event"
 }
 
-func (e *FileEvent) ColumnPath() string {
-	return "path"
+func (e *FileEvent) ColumnId() string {
+	return "id"
 }
 
-func (e *FileEvent) ColumnEvent() string {
-	return "event"
+func (e *FileEvent) ColumnDeletedFilesCount() string {
+	return "deleted_files_count"
 }
 
-func (e *FileEvent) ColumnTimestamp() string {
-	return "timestamp"
+func (e *FileEvent) ColumnCreatedFilesCount() string {
+	return "created_files_count"
 }
 
 type FileEventStore interface {

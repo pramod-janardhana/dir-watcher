@@ -16,7 +16,6 @@ type Service struct {
 }
 
 type Server struct {
-	Host           string
 	Port           string
 	AllowedOrigins []string
 	AllowMethods   []string
@@ -65,7 +64,6 @@ func LoadGeneralConfig() *General {
 
 	return &General{
 		Server: Server{
-			Host:           cfg.String("service.server.host"),
 			Port:           cfg.String("service.server.port"),
 			AllowedOrigins: cfg.Strings("service.server.allowedOrigins"),
 			AllowMethods:   cfg.Strings("service.server.allowMethods"),

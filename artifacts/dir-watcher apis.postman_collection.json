@@ -1,0 +1,107 @@
+{
+	"info": {
+		"_postman_id": "458621bb-0fbf-440f-946e-c31db3fff8f2",
+		"name": "DirWatch",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15529796",
+		"_collection_link": "https://www.postman.com/restless-rocket-731612/workspace/test-workspace/collection/15529796-458621bb-0fbf-440f-946e-c31db3fff8f2?action=share&source=collection_link&creator=15529796"
+	},
+	"item": [
+		{
+			"name": "Jobs",
+			"item": [
+				{
+					"name": "Get Job run details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8000/api/v1/cronjob?startAt=2024-01-31 20:23:45.0084399 +0000 UTC",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"cronjob"
+							],
+							"query": [
+								{
+									"key": "startAt",
+									"value": "2024-01-31 20:23:45.0084399 +0000 UTC"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update cron job config",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"cronExpresion\": \"@every 5s\",\r\n    \"magicString\": \"func\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8000/api/v1/cronjob/config",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"cronjob",
+								"config"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "File Watcher",
+			"item": [
+				{
+					"name": "Update file watcher config",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"dirOrFileToWatch\": \"../.\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8000/api/v1/filewatcher/config",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"filewatcher",
+								"config"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

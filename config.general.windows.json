@@ -13,7 +13,10 @@
     },
     "server": {
       "host": "127.0.0.1",
-      "ServerPort": 8000
+      "port": "8000",
+      "allowedOrigins": ["*"],
+      "allowedMethods": ["GET", "PUT"],
+      "allowedHeaders": ["Authorization", "Content-Type", "Origin", "ResponseType"]
     },
     "logging":{
       "path":"dirwatcher.log"

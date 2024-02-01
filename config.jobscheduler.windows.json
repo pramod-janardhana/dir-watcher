@@ -1,0 +1,4 @@
+{
+	"cronExpression": "@every 500s",
+	"magicString": "func"
+}

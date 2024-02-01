@@ -1,4 +1,6 @@
 # Introduction
+**Supported only on Windows**
+
 DirWatcher is long running background time looped scheduled task which exposes the results via REST API.
 This has two main components:
 1. REST API Server
@@ -141,8 +143,9 @@ Run the command from the root of the project
 [Postman collection](https://github.com/pramod-janardhana/dir-watcher/blob/main/artifacts/dir-watcher%20apis.postman_collection.json)
 
 # Limitations
-1. Only add and remove file events are supported. File events like rename, move etc are not supported.
-2. Does not perform strict validation on config files
+1. Supports only windows OS.
+2. Only add and remove file events are supported. File events like rename, move etc are not supported.
+3. Does not perform strict validation on config files
 
 # TODO:
 1. Add autentication and authorization to REST APIs.
